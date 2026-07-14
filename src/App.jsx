@@ -24,9 +24,13 @@ export default function App() {
   const [phase, setPhase] = useState(0)
   const [bulletActive, setBulletActive] = useState(false)
   const [instructionKey, setInstructionKey] = useState(0)
+  const [showLink, setShowLink] = useState(false) // Interruptor del enlace
   const prevPhase = useRef(0)
 
   const audio = useAudioManager()
+
+  // Monitoreo de fase en consola
+  console.log("Fase actual en tiempo real:", phase)
 
   useEffect(() => {
     if (prevPhase.current !== phase) {
@@ -35,8 +39,24 @@ export default function App() {
     }
   }, [phase])
 
+  // 2. Segundo useEffect (Controla la explosión y el retraso del enlace)
   useEffect(() => {
-    if (phase === 3) setBulletActive(true)
+    // Si la fase llegó a 3 (o superior), disparamos el reloj de inmediato
+    if (phase >= 3) {
+      setBulletActive(true)
+
+      console.log("¡Fase 3 detectada! Iniciando reloj de 15 segundos...");
+
+      const timer = setTimeout(() => {
+        console.log("¡Tiempo cumplido! Mostrando enlace...");
+        setShowLink(true)
+      }, 15000) // 15 segundos exactos
+
+      return () => clearTimeout(timer)
+    } else {
+      // Si reinicias o estás al principio, se mantiene oculto
+      setShowLink(false)
+    }
   }, [phase])
 
   const handleBulletDone = useCallback(() => {
@@ -67,7 +87,6 @@ export default function App() {
           />
         </Suspense>
 
-        {/* OrbitControls enabled fully in phase 3 for total 3D interaction */}
         <OrbitControls
           enablePan={false}
           enableZoom={true}
@@ -80,8 +99,7 @@ export default function App() {
         />
       </Canvas>
 
-      <Suspense fallback={<LoadingScreen />}>
-      </Suspense>
+      <Suspense fallback={<LoadingScreen />} />
 
       {instruction && (
         <div key={instructionKey} className="instruction-banner fade-enter" aria-live="polite" role="status">
@@ -92,16 +110,32 @@ export default function App() {
         </div>
       )}
 
-      {/* Minimalist Portfolio Portal Link */}
-      <a 
-        href="https://dmsulbaran.com" 
-        target="_blank" 
-        rel="noreferrer" 
-        className="portfolio-link-overlay"
+      {/* ENLACE AL PORTAFOLIO: Versión Blindada Anti-Errores */}
+      <a
+        href="https://dmsulbaran.github.io/fullstack-portfolio/"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: 'fixed',
+          bottom: '30px',
+          right: '30px',
+          fontFamily: 'monospace',
+          fontSize: '15px',
+          fontWeight: 'bold',
+          color: '#34d399', // Verde esmeralda brillante
+          backgroundColor: '#0a0a0a', // Fondo negro sólido para cortar el Canvas 3D
+          padding: '12px 20px',
+          borderRadius: '6px',
+          border: '2px solid #34d399', // Borde verde bien marcado
+          boxShadow: '0 0 15px rgba(52, 211, 153, 0.4)', // Resplandor neón
+          zIndex: 9999999, // Prioridad absoluta en la pantalla
+          cursor: 'pointer',
+          display: 'block', // Forzamos el renderizado
+          textDecoration: 'none'
+        }}
       >
         [ Explorar Portafolio Completo → ]
       </a>
-
       {/* Ambient scanline overlay */}
       <div
         aria-hidden="true"

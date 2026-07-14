@@ -252,3 +252,8 @@ html, body, #root {
   color: #fff;
   text-shadow: 0 0 12px rgba(255,255,255,0.8);
 }
+
+.hover-emerald-effect:hover {
+  color: #34d399 !important; /* Cambia a verde esmeralda al pasar el mouse */
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
+}
